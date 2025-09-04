@@ -1,34 +1,60 @@
 import streamlit as st
 from PIL import Image
 import pandas as pd
+import base64
 
 st.set_page_config(page_title="Contador de Rollos", layout="wide")
-st.title("📸 Contador manual de rollos")
+st.title("📸 Contador de rollos interactivo")
 
 # Subir imagen
 uploaded_file = st.file_uploader("Sube una imagen", type=["png", "jpg", "jpeg"])
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Imagen cargada", use_container_width=True)  # Actualizado
+    width, height = image.size
 
-    st.write("Haz clic sobre cada rollo para marcarlo:")
+    # Convertir imagen a base64 para usar en HTML
+    buffered = st.image(image)._repr_png_()
+    img_base64 = base64.b64encode(buffered).decode()
 
-    # Guardar puntos en session_state
+    # Inicializar puntos en session_state
     if "points" not in st.session_state:
         st.session_state.points = []
 
-    # Leer parámetros de la URL si existen
-    query_params = st.query_params
-    click_x = int(query_params.get("x", [0])[0]) if "x" in query_params else None
-    click_y = int(query_params.get("y", [0])[0]) if "y" in query_params else None
-    if click_x is not None and click_y is not None:
-        st.session_state.points.append((click_x, click_y))
+    # HTML + JS para capturar clics
+    html_code = f"""
+    <div style="position: relative; display: inline-block;">
+        <img id="img" src="data:image/png;base64,{img_base64}" width="{width}" height="{height}" style="display:block;">
+        <canvas id="canvas" width="{width}" height="{height}" style="position:absolute; top:0; left:0;"></canvas>
+    </div>
+    <script>
+    const img = document.getElementById('img');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.addEventListener('click', function(e) {{
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.round(e.clientX - rect.left);
+        const y = Math.round(e.clientY - rect.top);
+        ctx.fillStyle = 'red';
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, 2 * Math.PI);
+        ctx.fill();
+        // Enviar coordenadas a Streamlit
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = x + ',' + y;
+        input.name = 'clicked_point';
+        document.body.appendChild(input);
+    }});
+    </script>
+    """
 
-    # Agregar puntos manualmente con formulario
-    with st.form("add_point_form"):
-        x = st.number_input("Coordenada X (px)", min_value=0, max_value=image.width, step=1)
-        y = st.number_input("Coordenada Y (px)", min_value=0, max_value=image.height, step=1)
+    st.components.v1.html(html_code, height=height + 20, scrolling=True)
+
+    # Formulario para agregar punto manualmente en caso de no usar el clic JS
+    with st.form("manual_point_form"):
+        x = st.number_input("Coordenada X (px)", min_value=0, max_value=width, step=1)
+        y = st.number_input("Coordenada Y (px)", min_value=0, max_value=height, step=1)
         submit = st.form_submit_button("Agregar rollo")
         if submit:
             st.session_state.points.append((x, y))
@@ -36,10 +62,9 @@ if uploaded_file:
     # Mostrar resultados
     if st.session_state.points:
         st.success(f"🔴 Rollos marcados: {len(st.session_state.points)}")
-        df = pd.DataFrame(st.session_state.points, columns=["x", "y"])
+        df = pd.DataFrame(st.session_state.points, columns=["x","y"])
         st.dataframe(df)
 
-        # Descargar CSV
         csv = df.to_csv(index=False).encode("utf-8")
         st.download_button(
             "📥 Descargar coordenadas CSV",
