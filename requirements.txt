@@ -1,4 +1,4 @@
 streamlit
-matplotlib
-streamlit-image-annotation
-Pillow
+pillow
+pandas
+streamlit-drawable-canvas
