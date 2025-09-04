@@ -2,6 +2,7 @@ import streamlit as st
 from PIL import Image
 import pandas as pd
 import base64
+from io import BytesIO
 
 st.set_page_config(page_title="Contador de Rollos", layout="wide")
 st.title("📸 Contador de rollos interactivo")
@@ -13,9 +14,10 @@ if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     width, height = image.size
 
-    # Convertir imagen a base64 para usar en HTML
-    buffered = st.image(image)._repr_png_()
-    img_base64 = base64.b64encode(buffered).decode()
+    # Convertir imagen a base64
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    img_base64 = base64.b64encode(buffered.getvalue()).decode()
 
     # Inicializar puntos en session_state
     if "points" not in st.session_state:
@@ -28,7 +30,6 @@ if uploaded_file:
         <canvas id="canvas" width="{width}" height="{height}" style="position:absolute; top:0; left:0;"></canvas>
     </div>
     <script>
-    const img = document.getElementById('img');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     canvas.addEventListener('click', function(e) {{
@@ -39,19 +40,15 @@ if uploaded_file:
         ctx.beginPath();
         ctx.arc(x, y, 6, 0, 2 * Math.PI);
         ctx.fill();
-        // Enviar coordenadas a Streamlit
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = x + ',' + y;
-        input.name = 'clicked_point';
-        document.body.appendChild(input);
+        // Enviar coordenadas a Streamlit mediante console (placeholder, se puede mejorar con streamlit-events)
+        console.log(x, y);
     }});
     </script>
     """
 
     st.components.v1.html(html_code, height=height + 20, scrolling=True)
 
-    # Formulario para agregar punto manualmente en caso de no usar el clic JS
+    # Formulario para agregar puntos manualmente
     with st.form("manual_point_form"):
         x = st.number_input("Coordenada X (px)", min_value=0, max_value=width, step=1)
         y = st.number_input("Coordenada Y (px)", min_value=0, max_value=height, step=1)
