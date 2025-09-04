@@ -1,6 +1,7 @@
 import streamlit as st
-from streamlit_image_annotation import pointdet
 from PIL import Image
+from streamlit_drawable_canvas import st_canvas
+import pandas as pd
 
 st.set_page_config(page_title="Contador de Rollos", layout="wide")
 st.title("📸 Contador manual de rollos")
@@ -8,23 +9,40 @@ st.title("📸 Contador manual de rollos")
 # Subida de imagen
 uploaded_file = st.file_uploader("Sube una imagen", type=["png", "jpg", "jpeg"])
 
-if uploaded_file is not None:
+if uploaded_file:
     image = Image.open(uploaded_file)
 
-    # Herramienta interactiva con pointdet
-    puntos = pointdet(
-        image_path=None,               # No usar, vamos con PIL
-        label_list=["rollo"],          # Solo una clase: rollo
-        points=None,                   # Sin puntos iniciales
-        labels=None,
-        height=600,                    # Por ejemplo
-        width=800,                     # Ajusta según sea conveniente
-        point_width=5,
-        use_space=True,
-        key="rollos"
+    # Canvas interactivo
+    canvas_result = st_canvas(
+        background_image=image,
+        drawing_mode="point",        # Dibujar solo puntos
+        point_display_radius=6,      # Tamaño del punto
+        stroke_color="red",          # Color de los puntos
+        update_streamlit=True,
+        height=image.height,
+        width=image.width,
+        key="canvas"
     )
 
-    # Mostrar conteo
-    if puntos is not None:
+    # Extraer puntos
+    puntos = []
+    if canvas_result.json_data:
+        for obj in canvas_result.json_data["objects"]:
+            if obj.get("type") == "circle":
+                puntos.append((obj["left"], obj["top"]))
+
+    # Mostrar resultados
+    if puntos:
         st.success(f"🔴 Rollos marcados: {len(puntos)}")
-        st.write(puntos)  # Muestra datos de puntos si quieres
+
+        df = pd.DataFrame(puntos, columns=["x", "y"])
+        st.dataframe(df)
+
+        # Botón para exportar
+        csv = df.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            label="📥 Descargar coordenadas en CSV",
+            data=csv,
+            file_name="rollos_marcados.csv",
+            mime="text/csv",
+        )
