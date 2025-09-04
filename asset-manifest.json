@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/contador-rollos/static/css/main.6932c1d5.css",
+    "main.js": "/contador-rollos/static/js/main.daf67b5e.js",
+    "index.html": "/contador-rollos/index.html",
+    "main.6932c1d5.css.map": "/contador-rollos/static/css/main.6932c1d5.css.map",
+    "main.daf67b5e.js.map": "/contador-rollos/static/js/main.daf67b5e.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6932c1d5.css",
+    "static/js/main.daf67b5e.js"
+  ]
+}
