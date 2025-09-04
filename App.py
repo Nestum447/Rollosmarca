@@ -4,7 +4,7 @@ from streamlit_drawable_canvas import st_canvas
 import pandas as pd
 
 st.set_page_config(page_title="Contador de Rollos", layout="wide")
-st.title("📸 Contador de rollos interactivo")
+st.title("📸 Contador interactivo de rollos")
 
 # Subir imagen
 uploaded_file = st.file_uploader("Sube una imagen", type=["png","jpg","jpeg"])
@@ -13,7 +13,7 @@ if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Imagen cargada", use_container_width=True)
 
-    # Configurar canvas sobre la imagen
+    # Canvas sobre la imagen
     canvas_result = st_canvas(
         fill_color="rgba(255, 0, 0, 0.5)",  # color de los puntos
         stroke_width=5,
@@ -37,7 +37,7 @@ if uploaded_file:
             df = pd.DataFrame(coords, columns=["x","y"])
             st.dataframe(df)
 
-            # Botón para descargar CSV
+            # Descargar CSV
             csv = df.to_csv(index=False).encode("utf-8")
             st.download_button(
                 "📥 Descargar coordenadas CSV",
