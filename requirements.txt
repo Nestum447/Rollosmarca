@@ -1,4 +1,8 @@
-streamlit
+streamlit==1.30.0
+pillow
+pandas
+streamlit-drawable-canvas
+
 pillow
 pandas
 streamlit-drawable-canvas
