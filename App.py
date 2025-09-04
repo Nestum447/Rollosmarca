@@ -10,7 +10,7 @@ uploaded_file = st.file_uploader("Sube una imagen", type=["png", "jpg", "jpeg"])
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Imagen cargada", use_column_width=True)
+    st.image(image, caption="Imagen cargada", use_container_width=True)  # Actualizado
 
     st.write("Haz clic sobre cada rollo para marcarlo:")
 
