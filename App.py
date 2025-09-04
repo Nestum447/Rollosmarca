@@ -1,14 +1,15 @@
 import streamlit as st
 from PIL import Image
-from streamlit_drawable_canvas import st_canvas
+from streamlit_drawable_canvas_updated import st_canvas
+import pandas as pd
 
-st.title("Contador manual de rollos")
+st.title("📸 Contador manual de rollos")
 
 uploaded_file = st.file_uploader("Sube imagen", type=["png","jpg","jpeg"])
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGBA")
 
-    # Redimensionar si es muy grande
+    # Redimensionar si es demasiado grande
     max_width = 800
     if image.width > max_width:
         ratio = max_width / image.width
@@ -35,3 +36,13 @@ if uploaded_file:
 
     if puntos:
         st.success(f"🔴 Rollos marcados: {len(puntos)}")
+        df = pd.DataFrame(puntos, columns=["x","y"])
+        st.dataframe(df)
+
+        csv = df.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            "📥 Descargar coordenadas CSV",
+            data=csv,
+            file_name="rollos.csv",
+            mime="text/csv"
+        )
