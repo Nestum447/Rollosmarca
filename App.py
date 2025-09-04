@@ -1,47 +1,36 @@
 import streamlit as st
 from PIL import Image
-from streamlit_drawable_canvas import st_canvas
 import pandas as pd
+from streamlit_clickable_image import clickable_image
 
 st.set_page_config(page_title="Contador de Rollos", layout="wide")
 st.title("📸 Contador manual de rollos")
 
-uploaded_file = st.file_uploader("Sube una imagen", type=["png", "jpg", "jpeg"])
+# Subida de imagen
+uploaded_file = st.file_uploader("Sube una imagen", type=["png","jpg","jpeg"])
+
 if uploaded_file:
-    # Convertir siempre a RGB para evitar fondo blanco
     image = Image.open(uploaded_file).convert("RGB")
+    st.image(image, caption="Imagen cargada", use_column_width=True)
 
-    # Redimensionar si es muy grande
-    max_width = 800
-    if image.width > max_width:
-        ratio = max_width / image.width
-        new_height = int(image.height * ratio)
-        image = image.resize((max_width, new_height))
+    st.write("Haz clic sobre cada rollo para marcarlo:")
 
-    # Canvas interactivo
-    canvas_result = st_canvas(
-        background_image=image,
-        drawing_mode="point",
-        point_display_radius=6,
-        stroke_color="red",
-        update_streamlit=True,
-        height=image.height,
-        width=image.width,
-        key="canvas"
-    )
+    # Guardar coordenadas de clics
+    if "points" not in st.session_state:
+        st.session_state.points = []
 
-    # Extraer puntos
-    puntos = []
-    if canvas_result.json_data:
-        for obj in canvas_result.json_data["objects"]:
-            if obj.get("type") == "circle":
-                puntos.append((obj["left"], obj["top"]))
+    # Capturar clics con clickable_image
+    clicked = clickable_image(image=image, key="click_image")
+    if clicked:
+        st.session_state.points.append(clicked)
 
-    if puntos:
-        st.success(f"🔴 Rollos marcados: {len(puntos)}")
-        df = pd.DataFrame(puntos, columns=["x", "y"])
+    # Mostrar resultados
+    if st.session_state.points:
+        st.success(f"🔴 Rollos marcados: {len(st.session_state.points)}")
+        df = pd.DataFrame(st.session_state.points, columns=["x","y"])
         st.dataframe(df)
 
+        # Descargar CSV
         csv = df.to_csv(index=False).encode("utf-8")
         st.download_button(
             "📥 Descargar coordenadas CSV",
