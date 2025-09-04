@@ -6,12 +6,12 @@ import pandas as pd
 st.set_page_config(page_title="Contador de Rollos", layout="wide")
 st.title("📸 Contador manual de rollos")
 
-# Subir imagen
 uploaded_file = st.file_uploader("Sube una imagen", type=["png", "jpg", "jpeg"])
 if uploaded_file:
-    image = Image.open(uploaded_file).convert("RGBA")  # Convertir a RGBA para evitar fondo blanco
+    # Convertir siempre a RGB para evitar fondo blanco
+    image = Image.open(uploaded_file).convert("RGB")
 
-    # Redimensionar si es demasiado grande
+    # Redimensionar si es muy grande
     max_width = 800
     if image.width > max_width:
         ratio = max_width / image.width
@@ -37,14 +37,11 @@ if uploaded_file:
             if obj.get("type") == "circle":
                 puntos.append((obj["left"], obj["top"]))
 
-    # Mostrar resultados
     if puntos:
         st.success(f"🔴 Rollos marcados: {len(puntos)}")
-
         df = pd.DataFrame(puntos, columns=["x", "y"])
         st.dataframe(df)
 
-        # Descargar CSV
         csv = df.to_csv(index=False).encode("utf-8")
         st.download_button(
             "📥 Descargar coordenadas CSV",
