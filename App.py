@@ -1,23 +1,25 @@
 import streamlit as st
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
-import pandas as pd
 
-st.set_page_config(page_title="Contador de Rollos", layout="wide")
-st.title("📸 Contador manual de rollos")
+st.title("Contador manual de rollos")
 
-# Subida de imagen
-uploaded_file = st.file_uploader("Sube una imagen", type=["png", "jpg", "jpeg"])
-
+uploaded_file = st.file_uploader("Sube imagen", type=["png","jpg","jpeg"])
 if uploaded_file:
-    image = Image.open(uploaded_file)
+    image = Image.open(uploaded_file).convert("RGBA")
 
-    # Canvas interactivo
+    # Redimensionar si es muy grande
+    max_width = 800
+    if image.width > max_width:
+        ratio = max_width / image.width
+        new_height = int(image.height * ratio)
+        image = image.resize((max_width, new_height))
+
     canvas_result = st_canvas(
         background_image=image,
-        drawing_mode="point",        # Dibujar solo puntos
-        point_display_radius=6,      # Tamaño del punto
-        stroke_color="red",          # Color de los puntos
+        drawing_mode="point",
+        point_display_radius=6,
+        stroke_color="red",
         update_streamlit=True,
         height=image.height,
         width=image.width,
@@ -31,18 +33,5 @@ if uploaded_file:
             if obj.get("type") == "circle":
                 puntos.append((obj["left"], obj["top"]))
 
-    # Mostrar resultados
     if puntos:
         st.success(f"🔴 Rollos marcados: {len(puntos)}")
-
-        df = pd.DataFrame(puntos, columns=["x", "y"])
-        st.dataframe(df)
-
-        # Botón para exportar
-        csv = df.to_csv(index=False).encode("utf-8")
-        st.download_button(
-            label="📥 Descargar coordenadas en CSV",
-            data=csv,
-            file_name="rollos_marcados.csv",
-            mime="text/csv",
-        )
