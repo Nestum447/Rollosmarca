@@ -1,7 +1,4 @@
-# Core
 streamlit==1.30.0
 pillow
 pandas
-
-# Canvas interactivo
-streamlit-drawable-canvas==0.9.0
+streamlit-drawable-canvas-updated
