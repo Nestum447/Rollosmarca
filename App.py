@@ -1,6 +1,6 @@
 import streamlit as st
 from PIL import Image
-from streamlit_drawable_canvas_updated import st_canvas
+from streamlit_drawable_canvas import st_canvas
 import pandas as pd
 
 st.title("📸 Contador manual de rollos")
