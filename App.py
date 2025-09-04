@@ -3,13 +3,12 @@ from PIL import Image
 import pandas as pd
 from io import BytesIO
 import base64
-from streamlit_javascript import st_javascript
 
 st.set_page_config(page_title="Contador de Rollos", layout="wide")
 st.title("📸 Contador interactivo de rollos")
 
 # Subir imagen
-uploaded_file = st.file_uploader("Sube una imagen", type=["png", "jpg", "jpeg"])
+uploaded_file = st.file_uploader("Sube una imagen", type=["png","jpg","jpeg"])
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
@@ -24,30 +23,49 @@ if uploaded_file:
     if "points" not in st.session_state:
         st.session_state.points = []
 
-    # Mostrar imagen y capturar clics con JS
-    js_code = f"""
-    const img = document.createElement('img');
-    img.src = "data:image/png;base64,{img_base64}";
-    img.style.width = "{width}px";
-    img.style.height = "{height}px";
-    img.style.position = "relative";
-    document.body.appendChild(img);
+    # Mostrar imagen y capturar clics con HTML + JS
+    html_code = f"""
+    <div style="position: relative; display: inline-block;">
+        <img id="img" src="data:image/png;base64,{img_base64}" width="{width}" height="{height}" style="display:block;">
+        <canvas id="canvas" width="{width}" height="{height}" style="position:absolute; top:0; left:0;"></canvas>
+    </div>
+    <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
 
-    img.addEventListener('click', function(e) {{
-        const rect = img.getBoundingClientRect();
+    canvas.addEventListener('click', function(e) {{
+        const rect = canvas.getBoundingClientRect();
         const x = Math.round(e.clientX - rect.left);
         const y = Math.round(e.clientY - rect.top);
-        return [x, y];
+
+        // Dibujar punto
+        ctx.fillStyle = 'red';
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, 2*Math.PI);
+        ctx.fill();
+
+        // Guardar en un input temporal para capturar en Streamlit
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'clicked_point';
+        input.value = x + ',' + y;
+        input.style.display = 'none';
+        document.body.appendChild(input);
     }});
+    </script>
     """
-    # Ejecutar JS y obtener coordenadas
-    clicked_point = st_javascript(js_code, key="js_click")
 
-    # Guardar clic en session_state si existe
-    if clicked_point:
-        st.session_state.points.append(tuple(clicked_point))
+    st.components.v1.html(html_code, height=height + 20, scrolling=True)
 
-    # Mostrar conteo automático
+    # Formulario opcional para agregar puntos manualmente
+    with st.form("manual_point_form"):
+        x = st.number_input("Coordenada X (px)", min_value=0, max_value=width, step=1)
+        y = st.number_input("Coordenada Y (px)", min_value=0, max_value=height, step=1)
+        submit = st.form_submit_button("Agregar rollo")
+        if submit:
+            st.session_state.points.append((x, y))
+
+    # Mostrar resultados en tiempo real
     if st.session_state.points:
         st.success(f"🔴 Rollos marcados: {len(st.session_state.points)}")
         df = pd.DataFrame(st.session_state.points, columns=["x", "y"])
