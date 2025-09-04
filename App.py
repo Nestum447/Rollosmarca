@@ -19,11 +19,11 @@ if uploaded_file:
     image.save(buffered, format="PNG")
     img_base64 = base64.b64encode(buffered.getvalue()).decode()
 
-    # Inicializar puntos en session_state
+    # Inicializar lista de puntos
     if "points" not in st.session_state:
         st.session_state.points = []
 
-    # HTML + JS para capturar clics
+    # HTML + JS para clics interactivos
     html_code = f"""
     <div style="position: relative; display: inline-block;">
         <img id="img" src="data:image/png;base64,{img_base64}" width="{width}" height="{height}" style="display:block;">
@@ -32,23 +32,30 @@ if uploaded_file:
     <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+
     canvas.addEventListener('click', function(e) {{
         const rect = canvas.getBoundingClientRect();
         const x = Math.round(e.clientX - rect.left);
         const y = Math.round(e.clientY - rect.top);
+
+        // Dibujar el punto en rojo
         ctx.fillStyle = 'red';
         ctx.beginPath();
         ctx.arc(x, y, 6, 0, 2 * Math.PI);
         ctx.fill();
-        // Enviar coordenadas a Streamlit mediante console (placeholder, se puede mejorar con streamlit-events)
-        console.log(x, y);
+
+        // Agregar coordenadas a Streamlit
+        const formData = new FormData();
+        formData.append('x', x);
+        formData.append('y', y);
+        fetch('/_stcore/points', {{method: 'POST', body: formData}});
     }});
     </script>
     """
 
     st.components.v1.html(html_code, height=height + 20, scrolling=True)
 
-    # Formulario para agregar puntos manualmente
+    # Formulario alternativo para agregar puntos manualmente
     with st.form("manual_point_form"):
         x = st.number_input("Coordenada X (px)", min_value=0, max_value=width, step=1)
         y = st.number_input("Coordenada Y (px)", min_value=0, max_value=height, step=1)
@@ -62,6 +69,7 @@ if uploaded_file:
         df = pd.DataFrame(st.session_state.points, columns=["x","y"])
         st.dataframe(df)
 
+        # Descargar CSV
         csv = df.to_csv(index=False).encode("utf-8")
         st.download_button(
             "📥 Descargar coordenadas CSV",
