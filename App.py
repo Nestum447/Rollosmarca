@@ -18,10 +18,14 @@ if uploaded_file:
     if "points" not in st.session_state:
         st.session_state.points = []
 
-    # Capturar coordenadas relativas de clics
-    click = st.experimental_get_query_params().get("click")
-    # Si quieres capturar clics dinámicos en Cloud, esto se hace con st.image + JS
-    # Pero para simplicidad, agregamos un botón que simula clics manuales por coordenadas
+    # Leer parámetros de la URL si existen
+    query_params = st.query_params
+    click_x = int(query_params.get("x", [0])[0]) if "x" in query_params else None
+    click_y = int(query_params.get("y", [0])[0]) if "y" in query_params else None
+    if click_x is not None and click_y is not None:
+        st.session_state.points.append((click_x, click_y))
+
+    # Agregar puntos manualmente con formulario
     with st.form("add_point_form"):
         x = st.number_input("Coordenada X (px)", min_value=0, max_value=image.width, step=1)
         y = st.number_input("Coordenada Y (px)", min_value=0, max_value=image.height, step=1)
