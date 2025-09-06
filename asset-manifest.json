@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/Rollosmarca/static/css/main.6932c1d5.css",
-    "main.js": "/Rollosmarca/static/js/main.daf67b5e.js",
+    "main.js": "/Rollosmarca/static/js/main.dbcb13cf.js",
     "index.html": "/Rollosmarca/index.html",
     "main.6932c1d5.css.map": "/Rollosmarca/static/css/main.6932c1d5.css.map",
-    "main.daf67b5e.js.map": "/Rollosmarca/static/js/main.daf67b5e.js.map"
+    "main.dbcb13cf.js.map": "/Rollosmarca/static/js/main.dbcb13cf.js.map"
   },
   "entrypoints": [
     "static/css/main.6932c1d5.css",
-    "static/js/main.daf67b5e.js"
+    "static/js/main.dbcb13cf.js"
   ]
 }
