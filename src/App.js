@@ -20,6 +20,18 @@ function App() {
     setPoints([...points, { x, y }]);
   };
 
+  // Revertir último punto
+  const handleUndo = () => {
+    if (points.length > 0) {
+      setPoints(points.slice(0, -1));
+    }
+  };
+
+  // Limpiar todos los puntos
+  const handleClear = () => {
+    setPoints([]);
+  };
+
   // Dibujar puntos rojos sobre la imagen
   useEffect(() => {
     if (canvasRef.current && image) {
@@ -62,6 +74,42 @@ function App() {
 
       {/* Conteo */}
       <h2>Rollos marcados: {points.length}</h2>
+
+      {/* Botones de control */}
+      {points.length > 0 && (
+        <div style={{ marginBottom: "15px" }}>
+          <button
+            onClick={handleUndo}
+            style={{
+              padding: "10px 15px",
+              marginRight: "10px",
+              background: "orange",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              color: "white",
+              fontWeight: "bold",
+            }}
+          >
+            🔄 Revertir último
+          </button>
+
+          <button
+            onClick={handleClear}
+            style={{
+              padding: "10px 15px",
+              background: "red",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              color: "white",
+              fontWeight: "bold",
+            }}
+          >
+            🗑️ Limpiar todos
+          </button>
+        </div>
+      )}
 
       {/* Tabla y CSV */}
       {points.length > 0 && (
