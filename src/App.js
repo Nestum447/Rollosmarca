@@ -12,21 +12,11 @@ function App() {
     setPoints([]);
   };
 
-  // Agregar puntos con mouse o touch
+  // Agregar puntos (funciona con mouse y touch gracias a pointer events)
   const handleCanvasClick = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
-    let x, y;
-
-    if (e.touches) {
-      // Evento táctil
-      x = Math.round(e.touches[0].clientX - rect.left);
-      y = Math.round(e.touches[0].clientY - rect.top);
-    } else {
-      // Evento de mouse
-      x = Math.round(e.clientX - rect.left);
-      y = Math.round(e.clientY - rect.top);
-    }
-
+    const x = Math.round(e.clientX - rect.left);
+    const y = Math.round(e.clientY - rect.top);
     setPoints((prev) => [...prev, { x, y }]);
   };
 
@@ -77,8 +67,8 @@ function App() {
             width={600}
             height={400}
             style={{ position: "absolute", top: 0, left: 0 }}
-            onClick={handleCanvasClick}
-            onTouchStart={handleCanvasClick} // soporte táctil
+            onPointerDown={handleCanvasClick} // soporte universal (mouse + touch)
+            touchAction="none" // evita que Android/iPhone hagan scroll en lugar de marcar
           />
         </div>
       )}
