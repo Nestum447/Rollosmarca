@@ -3,6 +3,7 @@ Este proyecto es una aplicación en React que permite cargar una imagen, marcar 
 
 Sitio Web
 https://nestum447.github.io/Rollosmarca/
+
 🚀 Funcionalidades
 Subir una imagen desde el dispositivo.
 
