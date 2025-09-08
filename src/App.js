@@ -12,12 +12,22 @@ function App() {
     setPoints([]);
   };
 
-  // Agregar puntos al hacer clic en el canvas
+  // Agregar puntos con mouse o touch
   const handleCanvasClick = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
-    const x = Math.round(e.clientX - rect.left);
-    const y = Math.round(e.clientY - rect.top);
-    setPoints([...points, { x, y }]);
+    let x, y;
+
+    if (e.touches) {
+      // Evento táctil
+      x = Math.round(e.touches[0].clientX - rect.left);
+      y = Math.round(e.touches[0].clientY - rect.top);
+    } else {
+      // Evento de mouse
+      x = Math.round(e.clientX - rect.left);
+      y = Math.round(e.clientY - rect.top);
+    }
+
+    setPoints((prev) => [...prev, { x, y }]);
   };
 
   // Revertir último punto
@@ -68,6 +78,7 @@ function App() {
             height={400}
             style={{ position: "absolute", top: 0, left: 0 }}
             onClick={handleCanvasClick}
+            onTouchStart={handleCanvasClick} // soporte táctil
           />
         </div>
       )}
