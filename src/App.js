@@ -12,12 +12,12 @@ function App() {
     setPoints([]);
   };
 
-  // Agregar puntos (funciona con mouse y touch gracias a pointer events)
+  // Agregar puntos al hacer clic en el canvas
   const handleCanvasClick = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
     const x = Math.round(e.clientX - rect.left);
     const y = Math.round(e.clientY - rect.top);
-    setPoints((prev) => [...prev, { x, y }]);
+    setPoints([...points, { x, y }]);
   };
 
   // Revertir último punto
@@ -67,8 +67,7 @@ function App() {
             width={600}
             height={400}
             style={{ position: "absolute", top: 0, left: 0 }}
-            onPointerDown={handleCanvasClick} // soporte universal (mouse + touch)
-            touchAction="none" // evita que Android/iPhone hagan scroll en lugar de marcar
+            onClick={handleCanvasClick}
           />
         </div>
       )}
