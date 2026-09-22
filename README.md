@@ -9,7 +9,7 @@ https://nestum447.github.io/Rollosmarca/
 
 It sounds like a simple question.
 
-But when images contain a large number of rolls, manually counting and recording them can become:
+But when images or real time vision, contain a large number of rolls, manually counting and recording them can become:
 
 ❌ Time-consuming
 ❌ Repetitive
