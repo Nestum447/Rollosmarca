@@ -4,7 +4,7 @@ Interactive Roll Detection & Counting
 🌐 Try the application:
 https://nestum447.github.io/Rollosmarca/
 
-📸 How many rolls are in an image?
+📸 How many rolls are in an image, Camera, Container?
 
 
 It sounds like a simple question.
