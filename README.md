@@ -1,4 +1,10 @@
+
+
+🌐 Try the application:
+https://nestum447.github.io/Rollosmarca/
+
 📸 How many rolls are in an image?
+
 
 It sounds like a simple question.
 
@@ -52,8 +58,7 @@ The goal was to transform a manual identification and counting process into a di
 • useRef
 • react-csv
 
-🌐 Try the application:
-https://nestum447.github.io/Rollosmarca/
+
 
 This project is part of my journey to combine Logistics + Automation + Software Development + Data Analytics to solve real operational problems with technology.
 
